@@ -1,0 +1,27 @@
+[
+  {
+    "IP": "127.0.0.1",
+    "Port": 8080,
+    "ServerMax": 100,
+    "type": "server",
+    "ON": false  
+  },
+  {
+    "IP": "127.0.0.1",
+    "Port": 8080,
+    "type": "agv",
+    "ON": true
+  },
+  {
+    "IP": "127.0.0.1",
+    "Port": 8080,
+    "type": "ndc",
+    "ON": true
+  },
+  {
+    "IP": "127.0.0.1",
+    "Port": 8080,
+    "type": "wcs",
+    "ON": true
+  }
+]
