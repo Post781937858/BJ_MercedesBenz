@@ -1,5 +1,8 @@
 ﻿using MercedesBenz.Infrastructure;
+using MercedesBenz.SystemTask;
 using Topshelf;
+using System;
+using System.Linq;
 
 namespace MercedesBenz.Console
 {
@@ -7,14 +10,8 @@ namespace MercedesBenz.Console
     {
         static void Main(string[] args)
         {
-            HostFactory.Run(x =>                                 
+            HostFactory.Run(x =>
             {
-                //x.Service<TaskServer>();
-                //x.RunAsLocalSystem();                           
-                //x.SetDescription("AGV通讯服务");        
-                //x.SetDisplayName("Stuff");                       
-                //x.SetServiceName("Stuff");                      
-
                 x.Service<TaskServer>();
                 x.SetDescription(SystemConfiguration.Description);
                 x.SetDisplayName(SystemConfiguration.DisplayName);
@@ -22,6 +19,7 @@ namespace MercedesBenz.Console
                 x.EnablePauseAndContinue();
                 x.RunAsLocalSystem();
             });
+            System.Console.ReadKey();
         }
     }
 }

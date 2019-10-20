@@ -74,5 +74,16 @@ namespace MercedesBenz.Infrastructure
             }
             return (T)obj;
         }
+
+
+        /// <summary>
+        /// 通过枚举，获得其枚举值
+        /// </summary>
+        /// <param name="enumInstance"></param>
+        /// <returns></returns>
+        public static string GetValue<T>(T enumInstance)
+        {
+            return enumInstance.ToString();
+        }
     }
 }

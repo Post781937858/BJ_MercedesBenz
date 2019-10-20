@@ -109,13 +109,18 @@ namespace MercedesBenz.Infrastructure
         /// </summary>
         public void Start()
         {
-            if (!IsRunning)
+            try
             {
-                IsRunning = true;
-                _listener.Start();
-                _listener.BeginAcceptTcpClient(
-                  new AsyncCallback(HandleTcpClientAccepted), _listener);
+                if (!IsRunning)
+                {
+                    IsRunning = true;
+                    _listener.Start();
+                    _listener.BeginAcceptTcpClient(
+                      new AsyncCallback(HandleTcpClientAccepted), _listener);
+                }
             }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         /// <summary>
@@ -126,13 +131,18 @@ namespace MercedesBenz.Infrastructure
         /// </param>
         public void Start(int backlog)
         {
-            if (!IsRunning)
+            try
             {
-                IsRunning = true;
-                _listener.Start(backlog);
-                _listener.BeginAcceptTcpClient(
-                  new AsyncCallback(HandleTcpClientAccepted), _listener);
+                if (!IsRunning)
+                {
+                    IsRunning = true;
+                    _listener.Start(backlog);
+                    _listener.BeginAcceptTcpClient(
+                      new AsyncCallback(HandleTcpClientAccepted), _listener);
+                }
             }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         /// <summary>
@@ -140,16 +150,21 @@ namespace MercedesBenz.Infrastructure
         /// </summary>
         public void Stop()
         {
-            if (IsRunning)
+            try
             {
-                IsRunning = false;
-                _listener.Stop();
-                lock (_clients)
+                if (IsRunning)
                 {
-                    //关闭所有客户端连接
-                    CloseAllClient();
+                    IsRunning = false;
+                    _listener.Stop();
+                    lock (_clients)
+                    {
+                        //关闭所有客户端连接
+                        CloseAllClient();
+                    }
                 }
             }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         /// <summary>
@@ -158,35 +173,40 @@ namespace MercedesBenz.Infrastructure
         /// <param name="ar"></param>
         private void HandleTcpClientAccepted(IAsyncResult ar)
         {
-            if (IsRunning)
+            try
             {
-                TcpListener server = (TcpListener)ar.AsyncState;
-                Socket client = server.EndAcceptSocket(ar);
+                if (IsRunning)
+                {
+                    TcpListener server = (TcpListener)ar.AsyncState;
+                    Socket client = server.EndAcceptSocket(ar);
 
-                //检查是否达到最大的允许的客户端数目
-                if (_clientCount >= _maxClient)
-                {
-                    //C-TODO 触发事件
-                    RaiseOtherException(null);
-                }
-                else
-                {
-                    TCPClientState state = new TCPClientState(client);
-                    lock (_clients)
+                    //检查是否达到最大的允许的客户端数目
+                    if (_clientCount >= _maxClient)
                     {
-                        _clients.Add(state);
-                        _clientCount++;
-                        _clientChange = true;
-                        RaiseClientConnected(state); //触发客户端连接事件
+                        //C-TODO 触发事件
+                        RaiseOtherException(null);
                     }
-                    state.RecvDataBuffer = new byte[client.ReceiveBufferSize];
-                    //开始接受来自该客户端的数据
-                    client.BeginReceive(state.RecvDataBuffer, 0, state.RecvDataBuffer.Length, SocketFlags.None,
-                        new AsyncCallback(HandleDataReceived), state);
+                    else
+                    {
+                        TCPClientState state = new TCPClientState(client);
+                        lock (_clients)
+                        {
+                            _clients.Add(state);
+                            _clientCount++;
+                            _clientChange = true;
+                            RaiseClientConnected(state); //触发客户端连接事件
+                        }
+                        state.RecvDataBuffer = new byte[client.ReceiveBufferSize];
+                        //开始接受来自该客户端的数据
+                        client.BeginReceive(state.RecvDataBuffer, 0, state.RecvDataBuffer.Length, SocketFlags.None,
+                            new AsyncCallback(HandleDataReceived), state);
+                    }
+                    //接受下一个请求
+                    server.BeginAcceptSocket(new AsyncCallback(HandleTcpClientAccepted), ar.AsyncState);
                 }
-                //接受下一个请求
-                server.BeginAcceptSocket(new AsyncCallback(HandleTcpClientAccepted), ar.AsyncState);
             }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         /// <summary>
@@ -195,57 +215,60 @@ namespace MercedesBenz.Infrastructure
         /// <param name="ar"></param>
         private void HandleDataReceived(IAsyncResult ar)
         {
-            if (IsRunning)
+            try
             {
-                TCPClientState state = (TCPClientState)ar.AsyncState;
-                Socket client = state.ClientSocket;
-                try
+                if (IsRunning)
                 {
-                    //如果两次开始了异步的接收,所以当客户端退出的时候
-                    //会两次执行EndReceive
-                    if (ar != null)
+                    TCPClientState state = (TCPClientState)ar.AsyncState;
+                    Socket client = state.ClientSocket;
+                    try
                     {
-                        int recv = client.EndReceive(ar);
-                        if (recv == 0)
+                        //如果两次开始了异步的接收,所以当客户端退出的时候
+                        //会两次执行EndReceive
+                        if (ar != null)
                         {
-                            //触发事件 (关闭客户端)
-                            Close(state);
-                            RaiseNetError(state);
+                            int recv = client.EndReceive(ar);
+                            if (recv == 0)
+                            {
+                                //触发事件 (关闭客户端)
+                                Close(state);
+                                RaiseNetError(state);
+                                return;
+                            }
+                            //处理已经读取的数据 ps:数据在state的RecvDataBuffer中
+                            //触发数据接收事件
+                            ASCIIEncoding ascii = new ASCIIEncoding();
+                            state.Datagram = ascii.GetString(state.RecvDataBuffer).Trim("\0".ToCharArray());//去除字符串中的\0
+                            RaiseDataReceived(state);
+                        }
+                        else
+                        {
                             return;
                         }
-                        //处理已经读取的数据 ps:数据在state的RecvDataBuffer中
-                        //触发数据接收事件
-                        ASCIIEncoding ascii = new ASCIIEncoding();
-                        state.Datagram = ascii.GetString(state.RecvDataBuffer).Trim("\0".ToCharArray());//去除字符串中的\0
-                        RaiseDataReceived(state);
                     }
-                    else
+                    catch (SocketException)
                     {
+                        //异常处理
+                        RaiseNetError(state);
+                    }
+
+                    //接收之前清空byte[] 数据
+                    Array.Clear(state.RecvDataBuffer, 0, state.RecvDataBuffer.Length);
+                    //继续接收来自来客户端的数据
+                    try
+                    {
+                        client.BeginReceive(state.RecvDataBuffer, 0, state.RecvDataBuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceived), state);
+                    }
+                    catch (Exception)
+                    {
+                        Close(state);
+                        RaiseNetError(state);
                         return;
                     }
                 }
-                catch (SocketException ex)
-                {
-                    //异常处理
-                    Console.WriteLine(ex.ToString());
-                    RaiseNetError(state);
-                }
-
-                //接收之前清空byte[] 数据
-                Array.Clear(state.RecvDataBuffer, 0, state.RecvDataBuffer.Length);
-                //继续接收来自来客户端的数据
-                try
-                {
-                    client.BeginReceive(state.RecvDataBuffer, 0, state.RecvDataBuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceived), state);
-                }
-                catch (Exception ex)
-                {
-                    Close(state);
-                    RaiseNetError(state);
-                    Console.WriteLine(ex.ToString());
-                    return;
-                }
             }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         /// <summary>
@@ -255,16 +278,24 @@ namespace MercedesBenz.Infrastructure
         /// <param name="data">数据报文</param>
         public void Send(TCPClientState state, byte[] data)
         {
-            RaisePrepareSend(state);
-            if (!IsRunning)
-                throw new InvalidProgramException("This TCP Scoket server has not been started.");
-            if (state.ClientSocket == null)
-                throw new ArgumentNullException("client");
+            try
+            {
+                RaisePrepareSend(state);
+                if (!IsRunning)
+                    throw new InvalidProgramException("This TCP Scoket server has not been started.");
+                if (state.ClientSocket == null)
+                    throw new ArgumentNullException("client");
 
-            if (data == null)
-                throw new ArgumentNullException("data");
-            state.ClientSocket.BeginSend(data, 0, data.Length, SocketFlags.None,
-             new AsyncCallback(SendDataEnd), state.ClientSocket);
+                if (data == null)
+                    throw new ArgumentNullException("data");
+                state.ClientSocket.BeginSend(data, 0, data.Length, SocketFlags.None,
+                 new AsyncCallback(SendDataEnd), state.ClientSocket);
+            }
+            catch (Exception)
+            {   
+                //异常处理
+                RaiseNetError(state);
+            }
         }
 
         /// <summary>
@@ -273,8 +304,13 @@ namespace MercedesBenz.Infrastructure
         /// <param name="ar">目标客户端Socket</param>
         private void SendDataEnd(IAsyncResult ar)
         {
-            ((Socket)ar.AsyncState).EndSend(ar);
-            RaiseCompletedSend(null);
+            try
+            {
+                ((Socket)ar.AsyncState).EndSend(ar);
+                RaiseCompletedSend(null);
+            }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         #endregion Method
@@ -311,7 +347,7 @@ namespace MercedesBenz.Infrastructure
         {
             if (ClientDisconnected != null)
             {
-                ClientDisconnected(this, new AsyncEventArgs("连接断开"));
+                ClientDisconnected(this, new AsyncEventArgs(state));
             }
         }
 
@@ -411,14 +447,19 @@ namespace MercedesBenz.Infrastructure
         /// <param name="state">需要关闭的客户端会话对象</param>
         public void Close(TCPClientState state)
         {
-            if (state != null)
+            try
             {
-                state.Close();
-                _clients.Remove(state);
-                _clientChange = true;
-                _clientCount--;
-                RaiseClientDisconnected(state);
+                if (state != null)
+                {
+                    RaiseClientDisconnected(state);
+                    state.Close();
+                    _clients.Remove(state);
+                    _clientChange = true;
+                    _clientCount--;
+                }
             }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         /// <summary>
@@ -426,18 +467,23 @@ namespace MercedesBenz.Infrastructure
         /// </summary>
         public void CloseAllClient()
         {
-            while (true)
+            try
             {
-                if (_clients.Count > 0)
+                while (true)
                 {
-                    Close(_clients[0]); ;
+                    if (_clients.Count > 0)
+                    {
+                        Close(_clients[0]);
+                    }
+                    else break;
                 }
-                else break;
-            }
 
-            _clientCount = 0;
-            _clientChange = true;
-            _clients.Clear();
+                _clientCount = 0;
+                _clientChange = true;
+                _clients.Clear();
+            }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         #endregion Close
@@ -462,25 +508,30 @@ namespace MercedesBenz.Infrastructure
         /// to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            try
             {
-                if (disposing)
+                if (!this.disposed)
                 {
-                    try
+                    if (disposing)
                     {
-                        Stop();
-                        if (_listener != null)
+                        try
                         {
-                            _listener = null;
+                            Stop();
+                            if (_listener != null)
+                            {
+                                _listener = null;
+                            }
+                        }
+                        catch (SocketException)
+                        {
+                            RaiseOtherException(null);
                         }
                     }
-                    catch (SocketException)
-                    {
-                        RaiseOtherException(null);
-                    }
+                    disposed = true;
                 }
-                disposed = true;
             }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         #endregion 释放
@@ -579,11 +630,16 @@ namespace MercedesBenz.Infrastructure
         /// </summary>
         public void Close()
         {
-            //关闭数据的接受和发送
-            _clientSock.Shutdown(SocketShutdown.Both);
+            try
+            {
+                //关闭数据的接受和发送
+                _clientSock.Shutdown(SocketShutdown.Both);
 
-            //清理资源
-            _clientSock.Close();
+                //清理资源
+                _clientSock.Close();
+            }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
     }
 

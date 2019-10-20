@@ -130,7 +130,7 @@ namespace MercedesBenz.Infrastructure
         /// <summary>
         /// 是否已与服务器建立连接
         /// </summary>
-        public bool Connected { get { return tcpClient.Client.Connected; } }
+        public bool Connected { get { return tcpClient != null ? tcpClient.Client.Connected : false; ; } }
 
         /// <summary>
         /// 远端服务器的IP地址列表
@@ -183,10 +183,13 @@ namespace MercedesBenz.Infrastructure
             if (!Connected)
             {
                 // start the async connect operation
-                tcpClient.BeginConnect(
-                  Addresses, Port, HandleTcpServerConnected, tcpClient);
+                try
+                {
+                    tcpClient.BeginConnect(Addresses, Port, HandleTcpServerConnected, tcpClient);
+                }
+                catch (Exception ex)
+                { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
             }
-
             return this;
         }
 
@@ -196,13 +199,16 @@ namespace MercedesBenz.Infrastructure
         /// <returns>异步TCP客户端</returns>
         public AsyncTcpClient Close()
         {
-            if (Connected)
+            try
             {
-                retries = 0;
-                tcpClient.Close();
-                RaiseServerDisconnected(Addresses, Port);
+                if (Connected)
+                {
+                    retries = 0;
+                    tcpClient.Close();
+                    RaiseServerDisconnected(Addresses, Port);
+                }
             }
-
+            catch (Exception ex) { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
             return this;
         }
 
@@ -214,9 +220,12 @@ namespace MercedesBenz.Infrastructure
         {
             try
             {
-                tcpClient.EndConnect(ar);
-                RaiseServerConnected(Addresses, Port);
-                retries = 0;
+                if (tcpClient != null)
+                {
+                    tcpClient.EndConnect(ar);
+                    RaiseServerConnected(Addresses, Port);
+                    retries = 0;
+                }
             }
             catch (Exception ex)
             {
@@ -246,45 +255,58 @@ namespace MercedesBenz.Infrastructure
                 }
             }
 
-            // we are connected successfully and start asyn read operation.
-            byte[] buffer = new byte[tcpClient.ReceiveBufferSize];
-            tcpClient.GetStream().BeginRead(buffer, 0, buffer.Length, HandleDatagramReceived, buffer);
+            try
+            {
+                // we are connected successfully and start asyn read operation.
+                if (tcpClient != null)
+                {
+                    byte[] buffer = new byte[tcpClient.ReceiveBufferSize];
+                    tcpClient.GetStream().BeginRead(buffer, 0, buffer.Length, HandleDatagramReceived, buffer);
+                }
+            }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         private void HandleDatagramReceived(IAsyncResult ar)
         {
-            if (tcpClient.Connected)
+            try
             {
-                NetworkStream stream = tcpClient.GetStream();
-                //tcpClient.GetStream().EndRead(ar);
-                int numberOfReadBytes = 0;
-                try
+                if (tcpClient.Connected)
                 {
-                    numberOfReadBytes = stream.EndRead(ar);
-                }
-                catch
-                {
-                    numberOfReadBytes = 0;
-                }
+                    NetworkStream stream = tcpClient.GetStream();
+                    //tcpClient.GetStream().EndRead(ar);
+                    int numberOfReadBytes = 0;
+                    try
+                    {
+                        numberOfReadBytes = stream.EndRead(ar);
+                    }
+                    catch
+                    {
+                        numberOfReadBytes = 0;
+                    }
 
-                if (numberOfReadBytes == 0)
-                {
-                    // connection has been closed
-                    Close();
-                    return;
+                    if (numberOfReadBytes == 0)
+                    {
+                        // connection has been closed
+                        Close();
+                        return;
+                    }
+
+                    // received byte and trigger event notification
+                    byte[] buffer = (byte[])ar.AsyncState;
+                    byte[] receivedBytes = new byte[numberOfReadBytes];
+                    Buffer.BlockCopy(buffer, 0, receivedBytes, 0, numberOfReadBytes);
+                    RaiseDatagramReceived(tcpClient, receivedBytes);
+                    RaisePlaintextReceived(tcpClient, receivedBytes);
+
+                    // then start reading from the network again
+                    stream.BeginRead(
+                      buffer, 0, buffer.Length, HandleDatagramReceived, buffer);
                 }
-
-                // received byte and trigger event notification
-                byte[] buffer = (byte[])ar.AsyncState;
-                byte[] receivedBytes = new byte[numberOfReadBytes];
-                Buffer.BlockCopy(buffer, 0, receivedBytes, 0, numberOfReadBytes);
-                RaiseDatagramReceived(tcpClient, receivedBytes);
-                RaisePlaintextReceived(tcpClient, receivedBytes);
-
-                // then start reading from the network again
-                stream.BeginRead(
-                  buffer, 0, buffer.Length, HandleDatagramReceived, buffer);
             }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         #endregion Receive
@@ -312,12 +334,16 @@ namespace MercedesBenz.Infrastructure
 
         private void RaisePlaintextReceived(TcpClient sender, byte[] datagram)
         {
-            if (PlaintextReceived != null)
+            try
             {
-                PlaintextReceived(this,
-                  new TcpDatagramReceivedEventArgs<string>(
-                    sender, this.Encoding.GetString(datagram, 0, datagram.Length)));
+                if (PlaintextReceived != null)
+                {
+                    PlaintextReceived(this,
+                      new TcpDatagramReceivedEventArgs<string>(
+                        sender, this.Encoding.GetString(datagram, 0, datagram.Length)));
+                }
             }
+            catch (Exception ex ){ Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         /// <summary>
@@ -356,12 +382,16 @@ namespace MercedesBenz.Infrastructure
         private void RaiseServerExceptionOccurred(
           IPAddress[] ipAddresses, int port, Exception innerException)
         {
-            if (ServerExceptionOccurred != null)
+            try
             {
-                ServerExceptionOccurred(this,
-                  new TcpServerExceptionOccurredEventArgs(
-                    ipAddresses, port, innerException));
+                if (ServerExceptionOccurred != null)
+                {
+                    ServerExceptionOccurred(this,
+                      new TcpServerExceptionOccurredEventArgs(
+                        ipAddresses, port, innerException));
+                }
             }
+            catch (Exception ex) { Log4NetHelper.WriteErrorLog(ex.Message,ex);   }
         }
 
         #endregion Events
@@ -374,23 +404,32 @@ namespace MercedesBenz.Infrastructure
         /// <param name="datagram">报文</param>
         public void Send(byte[] datagram)
         {
-            if (datagram == null)
-                throw new ArgumentNullException("datagram");
-
-            if (!Connected)
+            try
             {
-                RaiseServerDisconnected(Addresses, Port);
-                throw new InvalidProgramException(
-                  "This client has not connected to server.");
-            }
+                if (datagram == null)
+                    throw new ArgumentNullException("datagram");
 
-            tcpClient.GetStream().BeginWrite(
-              datagram, 0, datagram.Length, HandleDatagramWritten, tcpClient);
+                if (!Connected)
+                {
+                    RaiseServerDisconnected(Addresses, Port);
+                    throw new InvalidProgramException(
+                      "This client has not connected to server.");
+                }
+
+                tcpClient.GetStream().BeginWrite(
+                  datagram, 0, datagram.Length, HandleDatagramWritten, tcpClient);
+            }
+            catch (Exception ex)
+            { Log4NetHelper.WriteErrorLog(ex.Message, ex); }
         }
 
         private void HandleDatagramWritten(IAsyncResult ar)
         {
-            ((TcpClient)ar.AsyncState).GetStream().EndWrite(ar);
+            try
+            {
+                ((TcpClient)ar.AsyncState).GetStream().EndWrite(ar);
+            }
+            catch (Exception ex)  { Log4NetHelper.WriteErrorLog(ex.Message, ex);  }
         }
 
         /// <summary>
@@ -425,27 +464,31 @@ namespace MercedesBenz.Infrastructure
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            try
             {
-                if (disposing)
+                if (!this.disposed)
                 {
-                    try
+                    if (disposing)
                     {
-                        Close();
-
-                        if (tcpClient != null)
+                        try
                         {
-                            tcpClient = null;
+                            Close();
+
+                            if (tcpClient != null)
+                            {
+                                tcpClient = null;
+                            }
+                        }
+                        catch (SocketException)
+                        {
+                            //ExceptionHandler.Handle(ex);
                         }
                     }
-                    catch (SocketException)
-                    {
-                        //ExceptionHandler.Handle(ex);
-                    }
-                }
 
-                disposed = true;
+                    disposed = true;
+                }
             }
+            catch (Exception ex){ Log4NetHelper.WriteErrorLog(ex.Message,ex); }
         }
 
         #endregion IDisposable Members

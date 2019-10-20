@@ -1,92 +1,128 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MercedesBenz.Infrastructure
 {
     public class BytePackagedis
     {
-        private static List<byte> severbyt = new List<byte>();
-
         /// <summary>
-        /// 粘包 断包处理
+        /// PLC Modbus解包 
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
         public static List<byte[]> AnalysisByte(byte[] message)
         {
-            List<byte[]> byteList = new List<byte[]>();
-            int Msglength = message.Length;
-            int byteLength = 25;
-            if (Msglength == byteLength)
+            List<byte[]> ListByte = new List<byte[]>();
+            if (message.Length < 8)
             {
-                if (message[0] == 0x01 && message[1] == 0x03 && message[2] == 0x14) //找到数据帧头
-                {
-                    byteList.Add(message);
-                }
-                severbyt.Clear();
+                return ListByte;
             }
-            else if (Msglength < byteLength)
+            for (int i = 0; i < message.Length; i++)
             {
-                for (int i = 0; i < message.Length; i++)
+                if (message.Length - i >= 8)
                 {
-                    severbyt.Add(message[i]);
-                }
-                if (severbyt.Count() == byteLength)
-                {
-                    byteList.Add(severbyt.ToArray());
-                    severbyt.Clear();
-                }
-                else if (severbyt.Count() > byteLength)
-                {
-                    severbyt.Clear();
-                }
-            }
-            else if (Msglength > byteLength)
-            {
-                for (int i = 0; i < Msglength; i++)
-                {
-                    if (message[i] == 0x01 && message[i + 1] == 0x03 && message[i + 2] == 0x14) //找到数据帧头
+                    if (message[i + 2] == 0x00 && message[i + 3] == 0x00 && message[i + 7] == 0x03)
                     {
-                        byte[] mesbyte = new byte[byteLength];
                         int index = i;
-                        for (int s = 0; s < byteLength; s++)
+                        int byteLength = 6 + message[i + 5];
+                        byte[] byt_message = new byte[byteLength];
+                        if (message.Length - index >= byteLength)
                         {
-                            if ((Msglength - 1) - index >= 3) //防止断包索引超出
+                            for (int s = 0; s < byteLength; s++)
                             {
-                                if (message[index] == 0x01 && message[index + 1] == 0x03 && message[index + 2] == 0x14 && index != i) //断包跳出
-                                    break;
-                            }
-                            if ((Msglength - 1) >= index)
-                            {
-                                mesbyte[s] = message[index];
+                                byt_message[s] = message[index];
                                 index++;
                             }
+                            ListByte.Add(byt_message);
                         }
-                        byteList.Add(mesbyte);
                     }
-                    if (i == 0 && severbyt.Count() > 0)
+                    else if (message[i + 2] == 0x00 && message[i + 3] == 0x00 && message[i + 7] == 0x10)
                     {
-                        byte[] mesbyte = new byte[byteLength];
-                        int index = 0;
-                        for (int m = 0; m < severbyt.Count(); m++)
+                        int index = i;
+                        int byteLength = 6 + message[i + 5];
+                        byte[] byt_message = new byte[byteLength];
+                        if (message.Length - index >= byteLength)
                         {
-                            mesbyte[index] = severbyt[m];
-                            index++;
-                        }
-                        for (int q = 0; q < byteLength - severbyt.Count(); q++)
-                        {
-                            if (index < byteLength)
+                            for (int s = 0; s < byteLength; s++)
                             {
-                                mesbyte[index] = message[q];
+                                byt_message[s] = message[index];
                                 index++;
                             }
+                            ListByte.Add(byt_message);
                         }
-                        byteList.Add(mesbyte);
                     }
                 }
-                severbyt.Clear();
             }
-            return byteList;
+            return ListByte;
+        }
+
+        public static List<byte[]> AnalysisSwitchByte(byte[] message)
+        {
+            List<byte[]> ListByte = new List<byte[]>();
+            if (message.Length < 8)
+            {
+                return ListByte;
+            }
+            for (int i = 0; i < message.Length; i++)
+            {
+                if (message.Length - i >= 8)
+                {
+                    if (message[i] == 0x68 && message[i + 1] == 0x00 && message[i + 2] == 0x00)
+                    {
+                        int index = i;
+                        int byteLength = 4 + message[i + 3] + 1;
+                        byte[] byt_message = new byte[byteLength];
+                        if (message.Length - index >= byteLength)
+                        {
+                            for (int s = 0; s < byteLength; s++)
+                            {
+                                byt_message[s] = message[index];
+                                index++;
+                            }
+                            ListByte.Add(byt_message);
+                        }
+                    }
+                }
+            }
+            return ListByte;
+        }
+
+
+        /// <summary>
+        /// NDC解包
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static List<byte[]> Unbind_Byte(byte[] message)
+        {
+            List<byte[]> ListByte = new List<byte[]>();
+            if (message.Length < 8)
+            {
+                return ListByte;
+            }
+            for (int i = 0; i < message.Length; i++)
+            {
+                if (message.Length - i >= 8)
+                {
+                    if (message[i] == 0x87 && message[i + 1] == 0xCD && message[i + 3] == 0x08 && message[i + 7] == 0x01)
+                    {
+                        int index = i;
+                        int byteLength = 8 + message[i + 5];
+                        byte[] byt_message = new byte[byteLength];
+                        if (message.Length - index >= byteLength)
+                        {
+                            for (int s = 0; s < byteLength; s++)
+                            {
+                                byt_message[s] = message[index];
+                                index++;
+                            }
+                            ListByte.Add(byt_message);
+                        }
+                    }
+                }
+            }
+            return ListByte;
         }
     }
 }

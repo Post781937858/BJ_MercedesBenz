@@ -1,0 +1,75 @@
+[
+  {
+    "IP": "172.16.32.110",
+    "Port": 9000,
+    "ServerMax": 100,
+    "type": "server",
+    "ON": true
+  },
+  {
+    "IP": "172.16.32.110",
+    "Port": 502,
+    "ServerMax": 100,
+    "type": "agvserver",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.132",
+    "Port": 502,
+    "type": "OutSite",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.131",
+    "Port": 502,
+    "type": "InSite",
+    "ON": true
+  },
+  {
+    "IP": "172.16.32.110",
+    "Port": 6000,
+    "type": "ndc",
+    "ON": true
+  },
+  {
+    "IP": "172.16.29.53",
+    "Port": 9000,
+    "type": "wcs",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.173",
+    "type": "weight",
+    "CarType": "agv",
+    "CarNumber": 1,
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.171",
+    "type": "light",
+    "CarType": "agv",
+    "CarNumber": 2,
+    "ON": true
+  },
+  {
+    "IP": "127.0.0.1",
+    "type": "light",
+    "CarType": "agv",
+    "CarNumber": 3,
+    "ON": false
+  },
+  {
+    "IP": "127.0.0.1",
+    "type": "weight",
+    "CarType": "agv",
+    "CarNumber": 4,
+    "ON": false
+  },
+  {
+    "IP": "127.0.0.1",
+    "type": "light",
+    "CarType": "agv",
+    "CarNumber": 5,
+    "ON": false
+  }
+]

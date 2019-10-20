@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{02F81986-1B50-4B88-8B8E-58AE3F45394E}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SwitchService</RootNamespace>
+    <AssemblyName>SwitchService</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ServiceConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MercedesBenz.DataBase\MercedesBenz.DataBase.csproj">
+      <Project>{ceb70a51-46b9-4f38-8b45-1a3ae1494843}</Project>
+      <Name>MercedesBenz.DataBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MercedesBenz.Infrastructure\MercedesBenz.Infrastructure.csproj">
+      <Project>{3718dbe7-8ca1-46fa-a133-7f90fc01456f}</Project>
+      <Name>MercedesBenz.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MercedesBenz.Models\MercedesBenz.Models.csproj">
+      <Project>{f80e5d76-3469-4f75-bf94-888cb07b8b30}</Project>
+      <Name>MercedesBenz.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MercedesBenz.SystemTask\MercedesBenz.SystemTask.csproj">
+      <Project>{94E83DB3-616E-4A35-821A-4235C8785E8A}</Project>
+      <Name>MercedesBenz.SystemTask</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties ServiceConfig_1json__JSONSchema="http://json.schemastore.org/azure-iot-edge-deployment-template-2.0" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

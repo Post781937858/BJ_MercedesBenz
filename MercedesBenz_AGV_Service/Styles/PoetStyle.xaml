@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Button.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="TabControl.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="FormControl.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="Label.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="DataGrid.xaml"></ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

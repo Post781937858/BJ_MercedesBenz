@@ -1,0 +1,51 @@
+[
+  {
+    "IP": "172.16.29.53",
+    "Port": 8811,
+    "ServerMax": 100,
+    "type": "SwitchServer",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.182",
+    "Port": 502,
+    "type": "AL2_2",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.183",
+    "Port": 502,
+    "type": "AL1_2",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.184",
+    "Port": 502,
+    "type": "AL3_2",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.185",
+    "Port": 502,
+    "type": "AL3_1",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.186",
+    "Port": 502,
+    "type": "AL2_1",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.187",
+    "Port": 502,
+    "type": "AL1_1",
+    "ON": true
+  },
+  {
+    "IP": "172.18.76.199",
+    "Port": 9000,
+    "type": "Temperature1",
+    "ON": true
+  }
+]

@@ -10,17 +10,12 @@ namespace MercedesBenz.Models
         /// <summary>
         /// 主键
         /// </summary>
-        public int Id { get; set; }
+        public int id { get; set; }
 
         /// <summary>
         /// 消息类型
         /// </summary>
         public string messageName { get; set; }
-
-        /// <summary>
-        /// 请求唯一标识
-        /// </summary>
-        public int soleId { get; set; }
 
     }
 }

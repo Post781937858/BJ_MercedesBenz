@@ -21,11 +21,48 @@ namespace MercedesBenz.Infrastructure
 
         public static string ServiceName { get { return ConfigurationManager.AppSettings["ServiceName"]; } }
 
+        public static string sourceCode { get { return ConfigurationManager.AppSettings["SourceCode"]; } }
+
+        public static string arecore { get { return ConfigurationManager.AppSettings["WCSarecore"]; } }
+
+        public static int DoorON { get { return ConfigurationManager.AppSettings["DoorON"].ToInt(); } }
+
+        public static bool IsRunDoor { get { return ConfigurationManager.AppSettings["IsRunDoor"].ToBool(); } }
+
+        public static int InDoorON { get { return OperateIniTool.OperateIniRead("Service", "InDoorNO").ToInt(); } }
+
+        public static int OutDoorON { get { return OperateIniTool.OperateIniRead("Service", "OutDoorNO").ToInt(); } }
+
+
+        /// <summary>
+        /// SQLDB连接字符
+        /// </summary>
+        public static string ConfigStringDB = ConfigurationManager.ConnectionStrings["DateBaseText"].ConnectionString;
+
+
+        /// <summary>
+        /// SQLDB连接字符
+        /// </summary>
+        public static string ConfigStringWebDB = ConfigurationManager.ConnectionStrings["DateBaseWebText"].ConnectionString;
+
+
+        /// <summary>
+        /// agv总数
+        /// </summary>
+        public static List<int> agvList
+        {
+            get
+            {
+                var agvCount = ConfigurationManager.AppSettings["agvCount"];
+                return !string.IsNullOrWhiteSpace(agvCount) ? agvCount.Split(',').Select(p => p.ToInt()).ToList() : new List<int>();
+            }
+        }
+
         /// <summary>
         /// 获取Service配置
         /// </summary>
         /// <returns></returns>
-        private static List<ServiceModel> Servicecfig()
+        public static List<ServiceModel> Servicecfig()
         {
             if (Services == null)
             {
@@ -41,19 +78,19 @@ namespace MercedesBenz.Infrastructure
         }
 
         /// <summary>
-        /// 获取所有远程主机配置
+        /// 获取远程主机配置
         /// </summary>
         /// <returns></returns>
-        public static List<ServiceModel> Distance_serve()
+        public static ServiceModel Distance_serve(IPType type)
         {
             List<ServiceModel> services = Servicecfig();
             if (services != null && services.Count() > 0)
             {
-                return services.Where(p => p.type != IPType.server).ToList();
+                return services.FirstOrDefault(p => p.type == type);
             }
             else
             {
-                return new List<ServiceModel>();
+                throw new Exception("配置读取失败！");
             }
         }
 
@@ -74,59 +111,31 @@ namespace MercedesBenz.Infrastructure
             }
         }
 
-        /// <summary>
-        /// 是否开启server
-        /// </summary>
-        public static bool ONserver
+        public static List<ServiceModel> CarService()
         {
-            get
+            List<ServiceModel> services = Servicecfig();
+            if (services != null && services.Count() > 0)
             {
-                return Servicecfig().FirstOrDefault(p=>p.type==IPType.server).ON;
+                return Servicecfig().Where(p => p.CarType == "agv").ToList();
             }
-        }
-
-        /// <summary>
-        /// 是否开启agv
-        /// </summary>
-        public static bool OnAgv
-        {
-            get
+            else
             {
-                List<ServiceModel> services = Servicecfig();
-                return services != null && services.Count() > 0 ? services.FirstOrDefault(p => p.type == IPType.agv).ON : false;
+                return null;
             }
         }
 
 
-        /// <summary>
-        /// 是否开启Ndc
-        /// </summary>
-        public static bool OnNdc
-        {
-            get
-            {
-                List<ServiceModel> services = Servicecfig();
-                return services != null && services.Count() > 0 ? services.FirstOrDefault(p => p.type == IPType.ndc).ON : false;
-            }
-        }
-        /// <summary>
-        /// 是否开启wcs
-        /// </summary>
-        public static bool OnWcs
-        {
-            get
-            {
-                List<ServiceModel> services = Servicecfig();
-                return services != null && services.Count() > 0 ? services.FirstOrDefault(p => p.type == IPType.wcs).ON : false;
-            }
-        }
+        #region 参数配置
 
+        //public static string OrderTypeNDC { get { return "NDC"; } }
 
+        //public static string OrderTypeAGV { get { return "AGV"; } }
 
+        //public static string OrderTaskIn { get { return "In"; } }
 
+        //public static string OrderTaskOut { get { return "Out"; } }
 
-
-
+        #endregion
 
     }
 }

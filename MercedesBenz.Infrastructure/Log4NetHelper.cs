@@ -26,7 +26,23 @@ namespace MercedesBenz.Infrastructure
             m_lstLog["task_log"] = LogManager.GetLogger("task_log");
             m_lstLog["debug_log"] = LogManager.GetLogger("debug_log");
             m_lstLog["error_log"] = LogManager.GetLogger("error_log");
+            m_lstLog["system_log"] = LogManager.GetLogger("system_log");
+            m_lstLog["door_log"] = LogManager.GetLogger("door_log");
         }
+
+        /// <summary>
+        /// 写入Drror日志
+        /// </summary>
+        /// <param name="strInfoLog">strInfoLog</param>
+        public static void WritedoorLog(string strInfoLog)
+        {
+
+            if (m_lstLog["door_log"].IsInfoEnabled)
+            {
+                m_lstLog["door_log"].Info(strInfoLog);
+            }
+        }
+
 
         /// <summary>
         /// 写入agv日志
@@ -38,6 +54,19 @@ namespace MercedesBenz.Infrastructure
             if (m_lstLog["agvtask_log"].IsInfoEnabled)
             {
                 m_lstLog["agvtask_log"].Info(strInfoLog);
+            }
+        }
+
+        /// <summary>
+        /// 写入system日志
+        /// </summary>
+        /// <param name="strInfoLog">strInfoLog</param>
+        public static void WriteSystemLog(string strInfoLog)
+        {
+
+            if (m_lstLog["system_log"].IsInfoEnabled)
+            {
+                m_lstLog["system_log"].Info(strInfoLog);
             }
         }
 
@@ -85,11 +114,11 @@ namespace MercedesBenz.Infrastructure
         /// </summary>
         /// <param name="strErrLog">strErrLog</param>
         /// <param name="ex">Exception</param>
-        public static void WriteDebugLog(string strErrLog, Exception ex = null)
+        public static void WriteDebugLog(string strErrLog)
         {
             if (m_lstLog["debug_log"].IsErrorEnabled)
             {
-                m_lstLog["debug_log"].Debug(strErrLog, ex);
+                m_lstLog["debug_log"].Debug(strErrLog);
             }
         }
 

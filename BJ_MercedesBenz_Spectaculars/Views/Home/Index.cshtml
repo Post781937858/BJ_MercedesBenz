@@ -1,0 +1,545 @@
+﻿
+@{
+    Layout = null;
+}
+@using System.Configuration;
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>北京奔驰-中央备件库监控看板</title>
+    <link rel="icon" href="~/Content/img/log.png">
+    <link href="~/Content/Main.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.6.4.min.js"></script>
+    <script src="~/Scripts/echarts.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.4.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    @*<script src="@ConfigurationManager.AppSettings["IPaddress"]/signalr/hubs"></script>*@
+</head>
+<body>
+    <div class="main-top-menu">
+        <div>北京奔驰中央备件库监控看板</div>
+        <img src="~/Content/img/log.png" />
+    </div>
+    <div class="main-left-menu">
+        <div class="main-left-menu-content">
+            <ul>
+                <li class="main-left-menu-list">
+                    <span class="main-left-insertion main--menu-title"><span style="background-image:url('../../Content/img/AGV.png');background-repeat:no-repeat;display:inline-block;height:19px;width:29px;line-height:19px;background-position:center;position:absolute;top:5.2px;left:40px;"></span>转运AGV状态</span>
+                    <div class="main--menu-agvcontent">
+                        <ul class="main--menu-agvcontent-ul">
+                            <li class="main--menu-agvinfo menuagv">
+                                <ul class="main--menu-agvinfo">
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">1</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo menuagv">
+                                <ul class="main--menu-agvinfo">
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">2</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo menuagv">
+                                <ul class="main--menu-agvinfo">
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">3</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo menuagv">
+                                <ul class="main--menu-agvinfo">
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">4</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo menuagv">
+                                <ul class="main--menu-agvinfo">
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">5</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="main-left-menu-list">
+                    <span class="main-left-insertion main--menu-title"><span style="background-image:url('../../Content/img/CH.png');background-repeat:no-repeat;display:inline-block;height:19px;width:42px;line-height:19px;background-position:center;position:absolute;top:5.2px;left:25px;"></span>叉车AGV状态</span>
+                    <div class="main--menu-forkliftcontent">
+                        <ul class="main--menu-forkliftcontent-ul">
+                            <li class="main--menu-agvinfo   forkliftinfo">
+                                <ul>
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">1</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo  forkliftinfo">
+                                <ul>
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">2</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo  forkliftinfo">
+                                <ul>
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">3</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="main-left-menu-list">
+                    <span class="main-left-insertion main--menu-title"><span style="background-image:url('../../Content/img/RGV.png');background-repeat:no-repeat;display:inline-block;height:21px;width:29px;line-height:21px;background-position:center;position:absolute;top:5.2px;left:40px;"></span>RGV状态</span>
+                    <div class="main--menu-RGVcontent">
+                        <ul class="main--menu-RGVcontent-ul">
+                            <li class="main--menu-agvinfo  rgvinfo">
+                                <ul>
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">1</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo  rgvinfo">
+                                <ul>
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">2</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo  rgvinfo">
+                                <ul>
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">3</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">车辆电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="main-left-menu-list">
+                    <span class="main-left-insertion main--menu-title"><span style="background-image:url('../../Content/img/CScar.png');background-repeat:no-repeat;display:inline-block;height:19px;width:29px;line-height:19px;background-position:center;position:absolute;top:5.2px;left:40px;"></span>穿梭车状态</span>
+                    <div class="main--menu-CarsHuttle">
+                        <ul class="main--menu-CarsHuttle-ul">
+                            <li class="main--menu-agvinfo menucarsHuttle">
+                                <ul>
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">1</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">小车电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                            <li class="main--menu-agvinfo menucarsHuttle">
+                                <ul>
+                                    <li class="main-left-insertion">车辆编号：<span class="messsage">2</span>号</li>
+                                    <li class="main-left-insertion">是否报警：<span class="messsage">否</span></li>
+                                    <li class="main-left-insertion">小车电压：<span class="messsage">0</span>V</li>
+                                    <li class="main-left-insertion">报警信息：<span class="messsage">正常</span></li>
+                                    <li class="main-left-insertion">状态信息：<span class="messsage">无任务</span></li>
+                                    <li class="main-left-insertion">是否充电：<span class="messsage">否</span></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="main-left-menu-list">
+                    <span class="main-left-insertion main--menu-title"><span style="background-image:url('../../Content/img/Line.png');background-repeat:no-repeat;display:inline-block;height:30px;width:29px;line-height:30px;background-position:center;position:absolute;top:1px;left:40px;"></span>输送线状态</span>
+                    <ul class="Line-Transport">
+                        <li class="main-left-insertion">是否报警：<span class="message">否</span></li>
+                        <li class="main-left-insertion">报警信息：<span class="message">正常</span> </li>
+                        <li class="main-left-insertion">状态信息：<span class="message">使用中</span></li>
+                        <li class="main-left-insertion">是否运行：<span class="message">是</span></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="main-content" style="z-index:-1">
+        <div style="background-color:#eaeaea;width:100%;height:100%;position:relative;">
+            <div class="main--content-map main-content-car">
+                <img src="~/Content/img/main.png" class="main--content-map" />
+                <span class="car-img"></span>
+                <span class="car1-img"></span>
+                @*<span class="car2-img"></span>*@
+                @*<span class="car3-img"></span>
+                <span class="car4-img"></span>*@
+            </div>
+            <div id="main" class="main-content-cartogram-left"></div>
+            <div id="main1" class="main-content-cartogram-rightTop "></div>
+            <div id="main2" class="main-content-cartogram-bottom"></div>
+            <div class="main-content-spectaculars">
+                <ul>
+                    <li>
+                        <dl class="main--menu-info">
+                            <dd class="main--menu-info-img"><img src="~/Content/img/wind.png" /></dd>
+                            <dd class="main--menu-info-text">风扇</dd>
+                            <dt class="main--menu-status">开</dt>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl class="main--menu-info">
+                            <dd class="main--menu-info-img"><img src="~/Content/img/light.png" /></dd>
+                            <dd class="main--menu-info-text">灯</dd>
+                            <dt class="main--menu-status">开</dt>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl class="main--menu-info">
+                            <dd class="main--menu-info-img"><img src="~/Content/img/temperature.png" /></dd>
+                            <dd class="main--menu-info-text">温度</dd>
+                            <dt class="main--menu-status"><span id="Temperature">0</span>&#8451;</dt>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl class="main--menu-info">
+                            <dd class="main--menu-info-img"><img src="~/Content/img/Humidity.png" /></dd>
+                            <dd class="main--menu-info-text">湿度</dd>
+                            <dt class="main--menu-status"><span id="Humidity">0</span>%</dt>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    @*<span class="main--menu-mesg main-menu-normal"></span>*@
+    @*<span class="main--menu-mesg main-menu-error"></span>*@
+    <script type="text/javascript">
+
+        function ShuttleMap(data) {
+
+            var ShuttleChart = echarts.init(document.getElementById('main'));
+
+            var option = {
+                title: {
+                    text: '穿梭车库'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: 'right',
+                    data: ['满库率', '空库率'],
+                },
+                series: [
+                    {
+                        name: '占比',
+                        type: 'pie',
+                        radius: ['32%', '70%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'inner',
+                                formatter: '{b}({d}%)'//多值的嵌套
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                        data: data,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            },
+                            normal: {
+                                color: function (params) {
+                                    //自定义颜色
+                                    var colorList = [
+                                        '#f1c621', '#cbc8d3',
+                                    ];
+                                    return colorList[params.dataIndex]
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+            ShuttleChart.setOption(option);
+        }
+
+        function atticMap(data) {
+
+            var atticChart = echarts.init(document.getElementById('main1'));
+
+            var option1 = {
+                title: {
+                    text: '阁楼库'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: 'right',
+                    data: ['满库率', '空库率']
+                },
+                series: [
+                    {
+                        name: '占比',
+                        type: 'pie',
+                        radius: ['32%', '70%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'inner',
+                                formatter: '{b}({d}%)'//多值的嵌套
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                        data: data,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            },
+                            normal: {
+                                color: function (params) {
+                                    //自定义颜色
+                                    var colorList = [
+                                        '#92c21e', '#cbc8d3',
+                                    ];
+                                    return colorList[params.dataIndex]
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+            atticChart.setOption(option1);
+        }
+
+        function HeavyMap(data) {
+
+            var HeavyChart = echarts.init(document.getElementById('main2'));
+
+            var option2 = {
+                title: {
+                    text: '重载库'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: 'right',
+                    data: ['满库率', '空库率']
+                },
+                series: [
+                    {
+                        name: '占比',
+                        type: 'pie',
+                        radius: ['32%', '70%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'inner',
+                                formatter: '{b}({d}%)'//多值的嵌套
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                        data: data,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            },
+                            normal: {
+                                color: function (params) {
+                                    //自定义颜色
+                                    var colorList = [
+                                        '#29a7e2', '#cbc8d3',
+                                    ];
+                                    return colorList[params.dataIndex]
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+            HeavyChart.setOption(option2);
+        }
+
+        var defaultData = [{ "name": "满库率", value: 100 }, { "name": "空库率", value: 100 }];
+        ShuttleMap(defaultData);
+        atticMap(defaultData);
+        HeavyMap(defaultData);
+
+        var menuagv = $('.main--menu-agvcontent-ul .menuagv').first().clone();
+        $('.main--menu-agvcontent-ul').append(menuagv).width($('.main--menu-agvcontent-ul .menuagv').length * ($('.main--menu-agvcontent-ul .menuagv').width()));
+
+        var agvIndex = 0;
+        setInterval(function () {
+            agvIndex++;
+            if (agvIndex == $('.main--menu-agvcontent-ul .menuagv').length) {
+                agvIndex = 1;
+                $('.main--menu-agvcontent-ul').css({ left: 0 });
+            };
+            $('.main--menu-agvcontent-ul').stop().animate({ left: -agvIndex * 300 }, 200);
+        }, 4000);
+
+
+        var menuagv = $('.main--menu-forkliftcontent-ul .forkliftinfo').first().clone();
+        $('.main--menu-forkliftcontent-ul').append(menuagv).width($('.main--menu-forkliftcontent-ul .forkliftinfo').length * ($('.main--menu-forkliftcontent-ul .forkliftinfo').width()));
+
+        var rgvIndex = 0;
+        setInterval(function () {
+            rgvIndex++;
+            if (rgvIndex == $('.main--menu-forkliftcontent-ul .forkliftinfo').length /2) {
+                rgvIndex = 1;
+                $('.main--menu-forkliftcontent-ul').css({ left: 0 });
+            };
+            $('.main--menu-forkliftcontent-ul').stop().animate({ left: -rgvIndex * 300 }, 200);
+        }, 4000);
+
+
+
+        var menuagv = $('.main--menu-RGVcontent-ul .rgvinfo').first().clone();
+        $('.main--menu-RGVcontent-ul').append(menuagv).width($('.main--menu-RGVcontent-ul .rgvinfo').length * ($('.main--menu-RGVcontent-ul .rgvinfo').width()));
+
+        var rgvIndex = 0;
+        setInterval(function () {
+            rgvIndex++;
+            if (rgvIndex == $('.main--menu-RGVcontent-ul .rgvinfo').length / 2) {
+                rgvIndex = 1;
+                $('.main--menu-RGVcontent-ul').css({ left: 0 });
+            };
+            $('.main--menu-RGVcontent-ul').stop().animate({ left: -rgvIndex * 300 }, 200);
+        }, 4000);
+
+
+
+
+        var menuagv = $('.main--menu-CarsHuttle-ul .menucarsHuttle').first().clone();
+        $('.main--menu-CarsHuttle-ul').append(menuagv).width($('.main--menu-CarsHuttle-ul .menucarsHuttle').length * ($('.main--menu-CarsHuttle-ul .menucarsHuttle').width()));
+
+        var HuttleIndex = 0;
+        setInterval(function () {
+            HuttleIndex++;
+            if (HuttleIndex == $('.main--menu-CarsHuttle-ul .menucarsHuttle').length) {
+                HuttleIndex = 1;
+                $('.main--menu-CarsHuttle-ul').css({ left: 0 });
+            };
+            $('.main--menu-CarsHuttle-ul').stop().animate({ left: -HuttleIndex * 300 }, 200);
+        }, 4000);
+
+        $(function () {
+            @*$.connection.hub.url = "@ConfigurationManager.AppSettings["IPaddress"]/signalr";*@
+            var chat = $.connection.chatHub;
+            console.log(chat.client);
+            chat.client.addMessage = function (name, message) {
+                var Obj = JSON.parse(message);
+                ShuttleMap(Obj.WarehouseStatusesList[0].warehouseData);
+                atticMap(Obj.WarehouseStatusesList[1].warehouseData);
+                HeavyMap(Obj.WarehouseStatusesList[2].warehouseData);
+                $('#Temperature').text(Obj.Temperature);
+                $('#Humidity').text(Obj.Humidity);
+                console.log(Obj);
+                for (var i = 0; i < Obj.agvInfoList.length; i++) {
+                    UpdateInfomessage('.main--menu-agvcontent-ul', ".menuagv", i, Obj.agvInfoList, i);
+                    if (i == Obj.agvInfoList.length - 1) {
+                        UpdateInfomessage('.main--menu-agvcontent-ul', ".menuagv", Obj.agvInfoList.length, Obj.agvInfoList, 0);
+                    }
+                }
+                for (var i = 0; i < Obj.forkCarinfoList.length; i++) {
+                    UpdateInfomessage('.main--menu-forkliftcontent-ul', ".forkliftinfo", i, Obj.forkCarinfoList, i);
+                    if (i == Obj.forkCarinfoList.length - 1) {
+                        UpdateInfomessage('.main--menu-forkliftcontent-ul', ".forkliftinfo", Obj.forkCarinfoList.lengt, Obj.forkCarinfoList, 0);
+                    }
+                }
+                for (var i = 0; i < Obj.RGVCarinfoList.length; i++) {
+                    UpdateInfomessage('.main--menu-RGVcontent-ul', ".rgvinfo", i, Obj.RGVCarinfoList, i);
+                    if (i == Obj.RGVCarinfoList.length - 1) {
+                        UpdateInfomessage('.main--menu-RGVcontent-ul', ".rgvinfo", Obj.RGVCarinfoList.length, Obj.RGVCarinfoList, 0);
+                    }
+                }
+
+                for (var i = 0; i < Obj.shuttleCarinfoList.length; i++) {
+                    UpdateInfomessage('.main--menu-CarsHuttle-ul', ".menucarsHuttle", i, Obj.shuttleCarinfoList, i);
+                    if (i == Obj.shuttleCarinfoList.length - 1) {
+                        UpdateInfomessage('.main--menu-CarsHuttle-ul', ".menucarsHuttle", Obj.shuttleCarinfoList.length, Obj.shuttleCarinfoList, 0);
+                    }
+                }
+                $('.Line-Transport').find('.message').eq(0).html(Obj.deliveryLineinfo.IsError == false ? "正常&nbsp;<span class='main--menu-mesg main-menu-normal'></span>" : "报警&nbsp;<span class='main--menu-mesg main-menu-error' ></span>");
+                $('.Line-Transport').find('.message').eq(1).text(Obj.deliveryLineinfo.ErrorMes);
+                $('.Line-Transport').find('.message').eq(2).text(Obj.deliveryLineinfo.IsRun == true ? "运行中" : "未使用");
+                $('.Line-Transport').find('.message').eq(3).text(Obj.deliveryLineinfo.IsRun == true ? "运行" : "停止");
+            };
+            $.connection.hub.start().done(function () {
+                //$('#sendmessage').click(function () {
+                //    chat.server.send($('#displayname').val(), $('#message').val());
+                //    $('#message').val('').focus();
+            });
+        });
+
+        function UpdateInfomessage(contentclass, childrenclass, childrenindex, Infolist,index) {
+            $(contentclass).children(childrenclass).eq(childrenindex).find('.messsage').eq(0).text(Infolist[index].CarNumber);
+            $(contentclass).children(childrenclass).eq(childrenindex).find('.messsage').eq(1).html(Infolist[index].IsError == false ? "正常&nbsp;<span class='main--menu-mesg main-menu-normal'></span>" : "报警&nbsp;<span class='main--menu-mesg main-menu-error' ></span>");
+            $(contentclass).children(childrenclass).eq(childrenindex).find('.messsage').eq(2).text(Infolist[index].Voltage);
+            $(contentclass).children(childrenclass).eq(childrenindex).find('.messsage').eq(3).text(Infolist[index].ErrorMes);
+            $(contentclass).children(childrenclass).eq(childrenindex).find('.messsage').eq(4).text(Infolist[index].Status);
+            $(contentclass).children(childrenclass).eq(childrenindex).find('.messsage').eq(5).text(Infolist[index].IsCharge == true ? "充电中" : "未充电");
+        }
+    </script>
+</body>
+</html>

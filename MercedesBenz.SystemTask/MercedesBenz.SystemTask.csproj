@@ -21,6 +21,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +32,24 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -44,12 +65,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncTcpClientTask.cs" />
-    <Compile Include="AsyncTcpServerTask.cs" />
+    <Compile Include="Client\Base\BaseTcpClient.cs" />
+    <Compile Include="InConnectionManage.cs" />
+    <Compile Include="OrderTaskClientWCS.cs" />
+    <Compile Include="OutConnectionManage.cs" />
+    <Compile Include="Server\Base\BaseTcpClientServer.cs" />
+    <Compile Include="GroupMessage.cs" />
+    <Compile Include="OrderTaskAGV.cs" />
+    <Compile Include="OrderTaskNDC.cs" />
+    <Compile Include="OrderTaskServiceWCS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SwitchDispose.cs" />
+    <Compile Include="SwitchManage.cs" />
     <Compile Include="TaskDispose.cs" />
+    <Compile Include="TemperatureManage.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MercedesBenz.DataBase\MercedesBenz.DataBase.csproj">
+      <Project>{ceb70a51-46b9-4f38-8b45-1a3ae1494843}</Project>
+      <Name>MercedesBenz.DataBase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MercedesBenz.Infrastructure\MercedesBenz.Infrastructure.csproj">
       <Project>{3718dbe7-8ca1-46fa-a133-7f90fc01456f}</Project>
       <Name>MercedesBenz.Infrastructure</Name>
@@ -60,7 +95,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
